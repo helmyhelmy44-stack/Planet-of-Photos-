@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كوكب الصور | الإمبراطورية الرقمية</title>
+    <style>
+        :root { --gold: #D4AF37; --black: #0a0a0a; --dark-grey: #1a1a1a; --glass: rgba(255, 255, 255, 0.05); }
+        body { background-color: var(--black); color: var(--gold); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; text-align: center; }
+        
+        /* الهيدر */
+        header { background: linear-gradient(to bottom, #000, var(--dark-grey)); padding: 20px; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
+        .logo-small { width: 50px; filter: drop-shadow(0 0 5px var(--gold)); }
+
+        /* الأقسام */
+        .section { display: none; padding: 20px; animation: fadeIn 0.5s; }
+        .active { display: block; }
+
+        /* كارت القيصر */
+        .admin-card { background: linear-gradient(145deg, #111, #000); border: 1px solid var(--gold); border-radius: 20px; padding: 20px; margin: 10px auto; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        .profile-img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 10px; }
+
+        /* معرض الصور */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; padding: 10px; }
+        .photo-item { aspect-ratio: 1; background: var(--dark-grey); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* أزرار التحكم */
+        .upload-area { border: 2px dashed var(--gold); padding: 30px; border-radius: 20px; margin: 20px; background: var(--glass); }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+        /* شريط التنقل السفلي */
+        nav { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid var(--gold); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1001; }
+        nav div { color: #888; font-size: 12px; cursor: pointer; transition: 0.3s; }
+        nav div.nav-active { color: var(--gold); font-weight: bold; }
+        nav div i { display: block; font-size: 20px; margin-bottom: 3px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <img src="https://img.icons8.com/fluent/512/crown.png" class="logo-small">
+        <h2 style="margin: 5px 0; font-size: 18px;">إمبراطورية كوكب الصور</h2>
+    </header>
+
+    <div id="home" class="section active">
+        <div class="admin-card">
+            <img src="https://img.icons8.com/color/512/administrator-male-level-up.png" class="profile-img">
+            <h3>أهلاً بالقيصر حلمي</h3>
+            <p style="font-size: 14px; color: #aaa;">رتبة: القيادة العليا</p>
+            <div id="status" style="color: #2ecc71;">● متصل بالخادم</div>
+        </div>
+        <div class="upload-area">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 40px; margin-bottom: 10px;"></i>
+            <p>إضافة صور جديدة للمنصة</p>
+            <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
+            <button class="btn-gold" onclick="document.getElementById('fileInput').click()">اختر صورة</button>
+        </div>
+    </div>
+
+    <div id="gallery" class="section">
+        <h3>معرض الإمبراطورية</h3>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="photo-item"><img src="https://picsum.photos/200/200?random=1"></div>
+            <div class="photo-item"><img src="https://picsum.photos/200/200?random=2"></div>
+            <div class="photo-item"><img src="https://picsum.photos/200/200?random=3"></div>
+            <div class="photo-item"><i class="fas fa-plus" style="opacity: 0.3;"></i></div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-active" onclick="showTab('home', this)"><i class="fas fa-crown"></i>القيادة</div>
+        <div onclick="showTab('gallery', this)"><i class="fas fa-images"></i>المعرض</div>
+        <div onclick="alert('قريباً: إعدادات الإمبراطورية')"><i class="fas fa-cog"></i>الإعدادات</div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        // بيانات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVLuQit8OogUQyVRl9jTtGpNU7P9aGAXw",
+            authDomain: "helmy44.firebaseapp.com",
+            projectId: "helmy44",
+            storageBucket: "helmy44.firebasestorage.app",
+            messagingSenderId: "567450066040",
+            appId: "1:567450066040:web:fb7a22b639a9cab8e4e18d"
+        };
+        const app = initializeApp(firebaseConfig);
+
+        window.showTab = function(tabId, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('nav div').forEach(n => n.classList.remove('nav-active'));
+            el.classList.add('nav-active');
+        };
+
+        window.handleFile = function(input) {
+            if (input.files && input.files[0]) {
+                alert("تم استلام الصورة في كوكب الصور جاري المعالجة يا قيصر...");
+                // هنا مستقبلاً هنضيف كود الرفع الحقيقي لـ Firebase Storage
+            }
+        };
+    </script>
+</body>
+</html>
